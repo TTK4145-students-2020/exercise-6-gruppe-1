@@ -7,14 +7,11 @@ import os
 import threading
 import socket
 
-local_path = "python C:\\Users\jeg_j\Desktop\exercise-6-gruppe-1 phoenix.py"
+local_path  = '~/Desktop/sanntid/exercise-6-gruppe-1/phoenix.py' ## edit this
 
 local_ip    = 'localhost'
-local_port  = 9000
+local_port  = 42069
 buffer      = 1024
-
-#local_path = os.path.dirname(os.path.realpath(__file__))
-
 
 is_master   = 0
 num         = 0
@@ -23,18 +20,18 @@ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-sock.bind(('localhost', 9000))
+sock.bind((local_ip,local_port))
 
 sock.settimeout(3)
 
 try:
-    print("listening to socket")
+    print("listening to socket...")
     sock.recvfrom(buffer)
-    num = int(data)
+    print("...is slave.")
 
-except (socket.timeout):                 # no one is sending
-    subprocess.call(['start',"python phoenix.py", 'python','phoenix.py'], shell=True)
-    print("spawned subprocess")
+except (socket.timeout):
+    subprocess.call('gnome-terminal -- python3 ' + local_path, shell=True)
+    print("...no master found. i am master.")
     is_master = 1
 
 
@@ -42,15 +39,15 @@ while(1):
     if (is_master):
         num += 1
         msg = str(num)
-        print("is master: ", num)
+        print(num)
         sock.sendto(msg.encode(), (local_ip, local_port))
         time.sleep(1)
 
     else:
-        print("is slave")
         try:
-            data, addr = socket.recvfrom(buffer)
+            data, addr = sock.recvfrom(buffer)
             num = int(data)
         except socket.timeout:
+            subprocess.call('gnome-terminal -- python3 ' + local_path, shell=True)
             is_master = 1
-            subprocess.call(['start',"python phoenix.py", 'python',"phoenix.py"], shell=True)
+            print("i am the master now.")
