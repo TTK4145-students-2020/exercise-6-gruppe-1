@@ -3,7 +3,7 @@ import socket
 import threading
 import time
 
-local_ip = "10.22.64.64"
+local_ip = "localhost"
 local_port = 9000
 buf = 1024
 skrr = True
@@ -28,12 +28,13 @@ class RepeatingTimer(object):
 
 def backup(s,backup_count):
     skrr = False
-    s2 = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     n = 3000
     for o in range(backup_count,n):
         time.sleep(1.5)
-        # msg = str(o)
-        # s2.sendto(msg.encode(), (local_ip,local_port+1))
+        msg = str(o)
+        sock.sendto(msg.encode(), (local_ip,local_port))
+
         print(o)
 
 def main():
